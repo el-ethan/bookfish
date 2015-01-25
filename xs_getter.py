@@ -1,9 +1,7 @@
 # _*_ coding: utf-8 _*_
-# TITLE: xiaoshuo_extractor v2.0 2014-12-25
-# TODO: write something that removes index.html from url of index if that exists
 
 """
-xs_getter is a scraper that takes the url of for the index page of
+xs_getter is a scraper that takes the url of the index page of
 a Chinese novel as its input, and outputs a text file with the complete
 text of the novel.
 """
