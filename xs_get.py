@@ -17,21 +17,30 @@ url = raw_input("Please enter a URL:").replace("index.html", "")
 response = urllib2.urlopen(url)
 toc_html = response.read()
 
-# Use regular expressions to find chapter codes in html
+# Use regex to find chapter codes in html
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
 chapter_codes = re_find_chapters.findall(toc_html)
 
+# Use regex to find extraneous text and code to be removed later
+junk = re.compile('(?<=<a)|\n.*(?=</a)')
+html_comm = re.compile('<!--.*-->', flags=re.DOTALL)
+extra_lines = re.compile('\n{4,}')
 
-# Create new urls
+# Create new urls and make soup
 for code in chapter_codes:
     new_url = url + code + ".html"
     new_response = urllib2.urlopen(new_url)
     html = new_response.read()
-    cleaner_html = re.sub('(?<=<a)|\n.*(?=</a)', '', html)
+    # Remove extraneous text that get_text below doesn't remove
+    clean_html = re.sub(html_comm, '', html)
+    cleaner_html = re.sub(junk, '', clean_html)
     soup = BeautifulSoup(cleaner_html)
-    pro_soup = soup.get_text()
-    cleaner_soup = re.sub('<!--.*-->', '', pro_soup, flags=re.DOTALL)
+    text = soup.get_text()
+
+    # Clean up text
+    rm_lines = re.sub(extra_lines, '\n\n', text)
+    cleaner_text = rm_lines.replace(u'->正文', '').replace(u'努努书坊 版权所有', '')
 
     # open new text file to fill with novel text
     with open("xiaoshuo.txt", 'a') as f:
-        f.write(cleaner_soup.encode('utf-8'))
+        f.write(cleaner_text.encode('utf-8'))
