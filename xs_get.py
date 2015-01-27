@@ -19,7 +19,13 @@ toc_html = response.read()
 
 # Use regex to find chapter codes in html
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
-chapter_codes = re_find_chapters.findall(toc_html)
+chapter_codes = re_find_chapters.findall(toc_html)  # List of codes
+
+# Find title in html
+m = re.search('(?<=<title>).*(?=</title>)', toc_html)
+title = m.group()
+# Decode title for use in file name later
+dec_title = title.decode('gbk')
 
 # Use regex to find extraneous text and code to be removed later
 junk = re.compile('(?<=<a)|\n.*(?=</a)')
@@ -42,5 +48,5 @@ for code in chapter_codes:
     cleaner_text = rm_lines.replace(u'->正文', '').replace(u'努努书坊 版权所有', '')
 
     # open new text file to fill with novel text
-    with open("xiaoshuo.txt", 'a') as f:
+    with open("%s.txt" % dec_title, 'a') as f:
         f.write(cleaner_text.encode('utf-8'))
