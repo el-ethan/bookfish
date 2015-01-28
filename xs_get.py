@@ -47,4 +47,4 @@ for code in chapter_codes:
 
     # open new text file to fill with novel text
     with open("%s.txt" % dec_title, 'a') as f:
-        f.write(cleaner_text.encode('utf-8'))
+        f.write(clean_text.encode('utf-8'))
