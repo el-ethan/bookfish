@@ -1,25 +1,23 @@
 # _*_ coding: utf-8 _*_
-
 """
 xs_getter is a scraper that takes the url of the index page of
 a Chinese novel as its input, and outputs a text file with the complete
 text of the novel.
-"""
-# TODO: Get rid of "->正文" with ->?\W\W, get rid of 努努书坊 版权所有,
-# get rid of extra newlines
 
+Currently the url should be from 努努书坊.
+"""
 import re
 import urllib2
 from bs4 import BeautifulSoup
 
-# This needs to be the url of the index page of novel.
+# Get html of index page of novel
 url = raw_input("Please enter a URL:").replace("index.html", "")
 response = urllib2.urlopen(url)
 toc_html = response.read()
 
-# Use regex to find chapter codes in html
+# Use regex to find chapter codes in html, save as list list
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
-chapter_codes = re_find_chapters.findall(toc_html)  # List of codes
+chapter_codes = re_find_chapters.findall(toc_html)
 
 # Find title in html
 m = re.search('(?<=<title>).*(?=</title>)', toc_html)
@@ -45,7 +43,7 @@ for code in chapter_codes:
 
     # Clean up text
     rm_lines = re.sub(extra_lines, '\n\n', text)
-    cleaner_text = rm_lines.replace(u'->正文', '').replace(u'努努书坊 版权所有', '')
+    clean_text = rm_lines.replace(u'->正文', '').replace(u'努努书坊 版权所有', '')
 
     # open new text file to fill with novel text
     with open("%s.txt" % dec_title, 'a') as f:
