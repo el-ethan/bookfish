@@ -9,14 +9,17 @@ import re
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
+def html_fixer(html, codec):
+    """decode html and return string"""
+    html = html.decode(codec)
+    return str(html)
+
 # Get html of index page of novel
 url =  'http://www.kanunu8.com/book4/9781/'
-#input("Please enter a URL:").replace("index.html", "")
+# input("Please enter a URL:").replace("index.html", "")
 response = urlopen(url)
 html = response.read()
-html = html.decode('gbk')
-html = str(html)
-
+html = html_fixer(html, 'gb18030')
 
 # Use regex to find chapter codes in html, save as list list
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
@@ -36,8 +39,7 @@ for code in chapter_codes:
     new_url = url + code + ".html"
     new_response = urlopen(new_url)
     html = new_response.read()
-    html = html.decode('gb18030')
-    html = str(html)
+    html = html_fixer(html, 'gb18030')
     # Remove extraneous text that get_text below doesn't remove
     clean_html = re.sub(html_comm, '', html)
     cleaner_html = re.sub(junk, '', clean_html)
