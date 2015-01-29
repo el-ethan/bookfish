@@ -14,16 +14,16 @@ url =  'http://www.kanunu8.com/book4/9781/'
 #input("Please enter a URL:").replace("index.html", "")
 response = urlopen(url)
 html = response.read()
-non_lat = html.decode('gbk')
-html_str = str(html)
+html = html.decode('gbk')
+html = str(html)
 
 
 # Use regex to find chapter codes in html, save as list list
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
-chapter_codes = re_find_chapters.findall(html_str)
+chapter_codes = re_find_chapters.findall(html)
 
 # Find title in html
-m = re.search('(?<=<title>).*(?=</title>)', non_lat)
+m = re.search('(?<=<title>).*(?=</title>)', html)
 title = m.group()
 
 # Use regex to find extraneous text and code to be removed later
@@ -36,10 +36,10 @@ for code in chapter_codes:
     new_url = url + code + ".html"
     new_response = urlopen(new_url)
     html = new_response.read()
-    non_lat = html.decode('gb18030')
-    html_str = str(non_lat)
+    html = html.decode('gb18030')
+    html = str(html)
     # Remove extraneous text that get_text below doesn't remove
-    clean_html = re.sub(html_comm, '', html_str)
+    clean_html = re.sub(html_comm, '', html)
     cleaner_html = re.sub(junk, '', clean_html)
     soup = BeautifulSoup(cleaner_html)
     text = soup.get_text()
