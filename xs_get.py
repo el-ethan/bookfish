@@ -7,23 +7,25 @@ text of the novel.
 Currently the url should be from 努努书坊.
 """
 import re
-import urllib2
+from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 # Get html of index page of novel
-url = raw_input("Please enter a URL:").replace("index.html", "")
-response = urllib2.urlopen(url)
-toc_html = response.read()
+url =  'http://www.kanunu8.com/book4/9781/'
+#input("Please enter a URL:").replace("index.html", "")
+response = urlopen(url)
+html = response.read()
+non_lat = html.decode('gbk')
+html_str = str(html)
+
 
 # Use regex to find chapter codes in html, save as list list
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
-chapter_codes = re_find_chapters.findall(toc_html)
+chapter_codes = re_find_chapters.findall(html_str)
 
 # Find title in html
-m = re.search('(?<=<title>).*(?=</title>)', toc_html)
+m = re.search('(?<=<title>).*(?=</title>)', non_lat)
 title = m.group()
-# Decode title for use in file name later
-dec_title = title.decode('gbk')
 
 # Use regex to find extraneous text and code to be removed later
 junk = re.compile('(?<=<a)|\n.*(?=</a)')
@@ -33,10 +35,12 @@ extra_lines = re.compile('\n{4,}')
 # Create new urls and make soup
 for code in chapter_codes:
     new_url = url + code + ".html"
-    new_response = urllib2.urlopen(new_url)
+    new_response = urlopen(new_url)
     html = new_response.read()
+    non_lat = html.decode('gb18030')
+    html_str = str(non_lat)
     # Remove extraneous text that get_text below doesn't remove
-    clean_html = re.sub(html_comm, '', html)
+    clean_html = re.sub(html_comm, '', html_str)
     cleaner_html = re.sub(junk, '', clean_html)
     soup = BeautifulSoup(cleaner_html)
     text = soup.get_text()
@@ -46,5 +50,5 @@ for code in chapter_codes:
     clean_text = rm_lines.replace(u'->正文', '').replace(u'努努书坊 版权所有', '')
 
     # open new text file to fill with novel text
-    with open("%s.txt" % dec_title, 'a') as f:
+    with open("%s.txt" % title, 'ab') as f:
         f.write(clean_text.encode('utf-8'))
