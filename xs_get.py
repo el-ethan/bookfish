@@ -1,4 +1,3 @@
-# _*_ coding: utf-8 _*_
 """
 xs_getter is a scraper that takes the url of the index page of
 a Chinese novel as its input, and outputs a text file with the complete
