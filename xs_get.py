@@ -15,17 +15,17 @@ def html_fixer(html, codec):
     return str(html)
 
 # Get html of index page of novel
-url =  'http://www.kanunu8.com/book4/9781/'
+url =  'http://www.kanunu8.com/book3/7192/'     # For testing purposes
 # input("Please enter a URL:").replace("index.html", "")
 response = urlopen(url)
 html = response.read()
-html = html_fixer(html, 'gb18030')
+html = html_fixer(html, codec='gb18030')
 
-# Use regex to find chapter codes in html, save as list list
+# Use regex to find chapter codes in html, save as list
 re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
 chapter_codes = re_find_chapters.findall(html)
 
-# Find title in html
+# Find title in html to use as output file name
 m = re.search('(?<=<title>).*(?=</title>)', html)
 title = m.group()
 
@@ -39,7 +39,7 @@ for code in chapter_codes:
     new_url = url + code + ".html"
     new_response = urlopen(new_url)
     html = new_response.read()
-    html = html_fixer(html, 'gb18030')
+    html = html_fixer(html, codec='gb18030')
     # Remove extraneous text that get_text below doesn't remove
     clean_html = re.sub(html_comm, '', html)
     cleaner_html = re.sub(junk, '', clean_html)
