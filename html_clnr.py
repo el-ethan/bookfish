@@ -8,21 +8,19 @@ def html_clnr(html, site=None):
                       '|&.*?;',           # Named character references
                       flags=re.DOTALL)
     # Extra newlines (2 or more consecutive)
-    extra_lines = re.compile('\n{2,}')
+    extra_lines = re.compile('\s{2,}')
 
-    nunu_junk = [
-                '--正文',
-                '努努书坊 版权所有',
-                ' | '
-    ]
+    nunu_junk = ['--正文', '努努书坊 版权所有','|']
 
     clean_text = re.sub(junk, '', html)
-    clean_text = re.sub(extra_lines, '\n\n', clean_text)
+
 
     # Remove site specific junk from text
     if site == 'nunu':
         for junk in nunu_junk:
             clean_text = clean_text.replace(junk, '')
+
+    clean_text = re.sub(extra_lines, '\n\n', clean_text)
 
     return clean_text
 
