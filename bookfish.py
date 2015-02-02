@@ -1,5 +1,5 @@
 """
-xs_getter is a scraper that takes the url of the index page of
+bookworm is a scraper that takes the url of the index page of
 a Chinese novel as its input, and outputs a text file with the complete
 text of the novel.
 
@@ -7,7 +7,7 @@ Currently the url should be from 努努书坊.
 """
 import re
 from urllib.request import urlopen
-from html_clnr import *
+import fishfood
 
 
 def html_decoder(html, codec):
@@ -38,8 +38,7 @@ for code in chapter_codes:
     html = html_decoder(html, codec='gb18030')
 
     # Remove extraneous text that get_text below doesn't remove
-
-    text = html_clnr(html, site='nunu')
+    text = fishfood.html_clnr(html, site='nunu')
 
     # open new text file to fill with novel text
     with open("%s.txt" % title, 'ab') as f:
