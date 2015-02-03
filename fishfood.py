@@ -1,6 +1,6 @@
 import re
 # TODO: Write docstring
-def html_clnr(html, site=None):
+def clean_food(html, site=None):
     """docstring"""
     junk = re.compile('<a.*?</a>'         # Links and associated text
                       '|<.*?>'            # HTML tags
@@ -54,4 +54,4 @@ if __name__ == "__main__":
 
     """
     print("Sample input:\n", sample_html)
-    print("Sample output:\n", html_clnr(sample_html, site='nunu'))
+    print("Sample output:\n", clean_food(sample_html, site='nunu'))
