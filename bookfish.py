@@ -8,8 +8,6 @@ Currently the url should be from 努努书坊.
 # TODO: update docstring
 import re
 from urllib.request import urlopen
-import fishfood
-
 
 # Return html from url, if codec is specified,
 # html will be decoded using that codec
@@ -34,6 +32,32 @@ def title_fish(html):
     title = re_find_title.group()
     return title
 
+def cleaner_fish(html, site=None):
+    """docstring"""
+    junk = re.compile('<a.*?</a>'         # Links and associated text
+                      '|<.*?>'            # HTML tags
+                      '|<!--.*-->'        # HTML comments
+                      '|&.*?;',           # Named character references
+                      flags=re.DOTALL)
+    # TODO: Change to regex so I can handle things like: '业务QQ: \d*'
+    # Site specific junk to remove
+    site_junk = {
+            'nunu': ['--正文', '努努书坊 版权所有','|'],
+            'yq888': []
+    }
+    # Extra newlines (2 or more consecutive)
+    extra_lines = re.compile('\s{2,}')
+
+    clean_text = re.sub(junk, '', html)
+
+    # Remove site specific junk from text
+    if site == 'nunu':
+        for junk in site_junk['nunu']:
+            clean_text = clean_text.replace(junk, '')
+    # Remove extra whitespace
+    clean_text = re.sub(extra_lines, '\n\n', clean_text)
+    return clean_text
+
 # Take a url (of table of contents page) along with
 # chapter codes, make new urls, get text from those urls
 def bookfish(base_url, chapter_codes,):
@@ -41,12 +65,12 @@ def bookfish(base_url, chapter_codes,):
     for code in chapter_codes:
         url = base_url + code + ".html"
         html = html_fish(url, codec='gb18030')
-    # Remove extraneous text that get_text below doesn't remove
-    text += fishfood.clean_food(html, site='nunu')
+        # Remove extraneous text that get_text below doesn't remove
+        text += cleaner_fish(html, site='nunu')
     return text
 
-
 if __name__ == '__main__':
+
     url = input("Please enter a URL:").replace("index.html", "")
     if not url:
         url = 'http://www.kanunu8.com/book3/7192/'
