@@ -1,6 +1,7 @@
+# TODO: Write docstrings
 import re
 from urllib.request import urlopen
-# TODO: Write docstrings
+
 def get_text(html, site=None):
     """Extract text from html"""
     junk = re.compile('<a.*?</a>'         # Links and associated text
@@ -45,6 +46,7 @@ def get_chapters(html):
 
 def get_title(html):
     """Return title of novel"""
+    # TODO: get rid of extra stuff in title
     re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
     title = re_find_title.group()
     return title
@@ -70,6 +72,12 @@ def get_novel_html(url, codec='gb18030'):
     return html_novel
 
 def bookfish(url, site='nunu', print_to_file=False):
+    """Returns full text of novel
+
+    If print_to_file is set to true, a text file
+    with the contents of the novel will be created
+    as 'title of novel.txt'
+    """
     contents_html = get_html(url)
     title = get_title(contents_html)
     html_novel = get_novel_html(url)
@@ -78,12 +86,13 @@ def bookfish(url, site='nunu', print_to_file=False):
         # open new text file to fill with novel text
         with open("%s.txt" % title, 'ab') as f:
             f.write(text.encode('utf-8'))
-    return text
+    else:
+        return text
 
 
 if __name__ == "__main__":
     url = input("Enter a URL:").replace("index.html", "")
     if not url:
         url = 'http://www.kanunu8.com/book3/7192/'
-    print(bookfish(url, print_to_file=True))
+    print(bookfish(url))
 
