@@ -1,7 +1,8 @@
 import re
-# TODO: Write docstring
-def clean_food(html, site=None):
-    """docstring"""
+from urllib.request import urlopen
+# TODO: Write docstrings
+def get_text(html, site=None):
+    """Extract text from html"""
     junk = re.compile('<a.*?</a>'         # Links and associated text
                       '|<.*?>'            # HTML tags
                       '|<!--.*-->'        # HTML comments
@@ -16,42 +17,73 @@ def clean_food(html, site=None):
     # Extra newlines (2 or more consecutive)
     extra_lines = re.compile('\s{2,}')
 
-    clean_text = re.sub(junk, '', html)
+    text = re.sub(junk, '', html)
 
     # Remove site specific junk from text
     if site == 'nunu':
         for junk in site_junk['nunu']:
-            clean_text = clean_text.replace(junk, '')
+            text = text.replace(junk, '')
     # Remove extra whitespace
-    clean_text = re.sub(extra_lines, '\n\n', clean_text)
-    return clean_text
+    text = re.sub(extra_lines, '\n\n', text)
+    return text
+
+# Return html from url, if codec is specified,
+# html will be decoded using that codec
+def get_html(url, codec='gb18030'):
+    """Retrieve html from url and decode with codec"""
+    response = urlopen(url)
+    html = response.read()
+    if codec:
+        html = str(html.decode(codec))
+    return html
+
+def get_chapters(html):
+    """Return list of chapter codes from html"""
+    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
+    chapter_codes = re_find_chapters.findall(html)
+    return chapter_codes
+
+def get_title(html):
+    """Return title of novel"""
+    re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
+    title = re_find_title.group()
+    return title
+
+def get_novel_html(url, codec='gb18030'):
+    """Return html of entire novel"""
+    html = urlopen(url).read().decode(codec)
+
+    # Find chapter codes
+    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
+    chapter_codes = re_find_chapters.findall(html)
+    # Find novel title
+    re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
+    title = re_find_title.group()
+
+    # Make new urls from chapter codes and compile novel
+    html_novel = ''
+    for code in chapter_codes:
+        new_url = url + code + ".html"
+        html = urlopen(new_url).read().decode(codec)
+        # Get text from html mess
+        html_novel += html
+    return html_novel
+
+def bookfish(url, site='nunu', print_to_file=False):
+    contents_html = get_html(url)
+    title = get_title(contents_html)
+    html_novel = get_novel_html(url)
+    text = get_text(html_novel, site)
+    if print_to_file:
+        # open new text file to fill with novel text
+        with open("%s.txt" % title, 'ab') as f:
+            f.write(text.encode('utf-8'))
+    return text
+
 
 if __name__ == "__main__":
+    url = input("Enter a URL:").replace("index.html", "")
+    if not url:
+        url = 'http://www.kanunu8.com/book3/7192/'
+    print(bookfish(url, print_to_file=True))
 
-    sample_html = """
-
-    <html>
-    <head>
-    <title> Chapter 1 - 杀手，回光返照的命运 - 小说在线阅读 - 九把刀</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=gbk">
-    <link href="/templets/style/kanunu6.css" rel="stylesheet" type="text/css" />
-    <style type="text/css">
-    <!--
-    body {
-        margin-left: 0px;
-        margin-top: 0px;
-        margin-right: 0px;
-        margin-bottom: 0px;
-        background-color: #464646;
-    }
-    .style1 {color: #FFFFFF}
-    -->
-    &nbsp;&nbsp;&nbsp;&nbsp;我坐在会议桌上，跟七个老头一起开会，但会议记录上没有半个字，因为他们在一分钟前全死光了。我特别喜欢接这种整个杀光抹净的单——我猜我以前一定是一个非常压抑的人，所以现在见鬼了特别喜欢解放自己。<br />
-    <script language="javascript" type="text/javascript" src="/advs/2024/bd01.js"></script>
-    <script language="javascript" type="text/javascript" src="/tj.js"></script>
-    </body>
-    </html>
-
-    """
-    print("Sample input:\n", sample_html)
-    print("Sample output:\n", clean_food(sample_html, site='nunu'))

@@ -1,39 +1,8 @@
-"""
-bookfish is a scraper that takes the url of the index page of
-a Chinese novel as its input, and outputs a text file with the complete
-text of the novel.
-
-Currently the url should be from 努努书坊.
-"""
-# TODO: update docstring
 import re
 from urllib.request import urlopen
-
-# Return html from url, if codec is specified,
-# html will be decoded using that codec
-def html_fish(url, codec=None):
-    response = urlopen(url)
-    html = response.read()
-    if codec:
-        html = str(html.decode(codec))
-    return html
-
-# Take html of table of contents page
-# and return (chapter_codes, title) tuple
-
-def chapter_fish(html):
-    # Find chapter codes
-    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
-    chapter_codes = re_find_chapters.findall(html)
-    return chapter_codes
-
-def title_fish(html):
-    re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
-    title = re_find_title.group()
-    return title
-
-def cleaner_fish(html, site=None):
-    """docstring"""
+# TODO: Write docstrings
+def get_text(html, site=None):
+    """Extract text from html"""
     junk = re.compile('<a.*?</a>'         # Links and associated text
                       '|<.*?>'            # HTML tags
                       '|<!--.*-->'        # HTML comments
@@ -48,40 +17,73 @@ def cleaner_fish(html, site=None):
     # Extra newlines (2 or more consecutive)
     extra_lines = re.compile('\s{2,}')
 
-    clean_text = re.sub(junk, '', html)
+    text = re.sub(junk, '', html)
 
     # Remove site specific junk from text
     if site == 'nunu':
         for junk in site_junk['nunu']:
-            clean_text = clean_text.replace(junk, '')
+            text = text.replace(junk, '')
     # Remove extra whitespace
-    clean_text = re.sub(extra_lines, '\n\n', clean_text)
-    return clean_text
-
-# Take a url (of table of contents page) along with
-# chapter codes, make new urls, get text from those urls
-def bookfish(base_url, chapter_codes,):
-    text = ''
-    for code in chapter_codes:
-        url = base_url + code + ".html"
-        html = html_fish(url, codec='gb18030')
-        # Remove extraneous text that get_text below doesn't remove
-        text += cleaner_fish(html, site='nunu')
+    text = re.sub(extra_lines, '\n\n', text)
     return text
 
-if __name__ == '__main__':
+# Return html from url, if codec is specified,
+# html will be decoded using that codec
+def get_html(url, codec='gb18030'):
+    """Retrieve html from url and decode with codec"""
+    response = urlopen(url)
+    html = response.read()
+    if codec:
+        html = str(html.decode(codec))
+    return html
 
-    url = input("Please enter a URL:").replace("index.html", "")
+def get_chapters(html):
+    """Return list of chapter codes from html"""
+    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
+    chapter_codes = re_find_chapters.findall(html)
+    return chapter_codes
+
+def get_title(html):
+    """Return title of novel"""
+    re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
+    title = re_find_title.group()
+    return title
+
+def get_novel_html(url, codec='gb18030'):
+    """Return html of entire novel"""
+    html = urlopen(url).read().decode(codec)
+
+    # Find chapter codes
+    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
+    chapter_codes = re_find_chapters.findall(html)
+    # Find novel title
+    re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
+    title = re_find_title.group()
+
+    # Make new urls from chapter codes and compile novel
+    html_novel = ''
+    for code in chapter_codes:
+        new_url = url + code + ".html"
+        html = urlopen(new_url).read().decode(codec)
+        # Get text from html mess
+        html_novel += html
+    return html_novel
+
+def bookfish(url, site='nunu', print_to_file=False):
+    contents_html = get_html(url)
+    title = get_title(contents_html)
+    html_novel = get_novel_html(url)
+    text = get_text(html_novel, site)
+    if print_to_file:
+        # open new text file to fill with novel text
+        with open("%s.txt" % title, 'ab') as f:
+            f.write(text.encode('utf-8'))
+    return text
+
+
+if __name__ == "__main__":
+    url = input("Enter a URL:").replace("index.html", "")
     if not url:
         url = 'http://www.kanunu8.com/book3/7192/'
-
-    chapter_codes = chapter_fish(html_fish(url, codec='gb18030'))
-    print(title_fish(html_fish(url, codec='gb18030')))
-    print(bookfish(url, chapter_codes))
-    # open new text file to fill with novel text
-    # with open("%s.txt" % title, 'ab') as f:
-    #     f.write(text.encode('utf-8'))
-
-
-
+    print(bookfish(url, print_to_file=True))
 
