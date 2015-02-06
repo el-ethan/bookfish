@@ -1,26 +1,22 @@
 """Various tests of bookfish."""
 import unittest
 import fishfood
+import bookfish
+from urllib.request import urlopen
 
+test_url = 'http://www.kanunu8.com/book3/7192/'
+test_html = urlopen(test_url).read()
 class TestFood(unittest.TestCase):
 
-    def test_rm_html_tags(self):
-        html = "<title>Chapter 1 - 杀手，回光返照的命运 - 九把刀</title>"
-        text = "Chapter 1 - 杀手，回光返照的命运 - 九把刀"
-        self.assertEqual(fishfood.clean_food(html), text)
+    def test_html_fish_with_codec(self):
+        self.assertEqual(bookfish.html_fish(test_url, codec='gb18030'),
+                        test_html.decode('gb18030'),
+                        "Decoded HTML output of function not as expected")
 
-    def test_rm_html_comments(self):
-        html_comment = """<!--
-                            body {
-                                margin-left: 0px;
-                                margin-top: 0px;
-                                margin-right: 0px;
-                                margin-bottom: 0px;
-                                background-color: #464646;
-                            }
-                            .style1 {color: #FFFFFF}
-                            -->"""
-        self.assertEqual(fishfood.clean_food(html_comment), '')
+    def test_html_fish_no_codec(self):
+        self.assertEqual(bookfish.html_fish(test_url),
+                        test_html,
+                        "HTML output of function not as expected")
 
 if __name__ == "__main__":
     unittest.main()
