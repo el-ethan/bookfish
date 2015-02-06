@@ -22,11 +22,11 @@ def html_fish(url, codec=None):
 
 # Take html of table of contents page
 # and return (chapter_codes, title) tuple
+
 def chapter_fish(html):
     # Find chapter codes
     re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
     chapter_codes = re_find_chapters.findall(html)
-    # Find novel title
     return chapter_codes
 
 def title_fish(html):

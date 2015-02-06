@@ -1,31 +1,30 @@
 import re
-
-def html_clnr(html, site=None):
+# TODO: Write docstring
+def clean_food(html, site=None):
     """docstring"""
     junk = re.compile('<a.*?</a>'         # Links and associated text
                       '|<.*?>'            # HTML tags
                       '|<!--.*-->'        # HTML comments
                       '|&.*?;',           # Named character references
                       flags=re.DOTALL)
+    # TODO: Change to regex so I can handle things like: '业务QQ: \d*'
+    # Site specific junk to remove
+    site_junk = {
+            'nunu': ['--正文', '努努书坊 版权所有','|'],
+            'yq888': []
+    }
     # Extra newlines (2 or more consecutive)
-    extra_lines = re.compile('\n{2,}')
-
-    nunu_junk = [
-                '--正文',
-                '努努书坊 版权所有',
-                ' | '
-    ]
+    extra_lines = re.compile('\s{2,}')
 
     clean_text = re.sub(junk, '', html)
-    clean_text = re.sub(extra_lines, '\n\n', clean_text)
 
     # Remove site specific junk from text
     if site == 'nunu':
-        for junk in nunu_junk:
+        for junk in site_junk['nunu']:
             clean_text = clean_text.replace(junk, '')
-
+    # Remove extra whitespace
+    clean_text = re.sub(extra_lines, '\n\n', clean_text)
     return clean_text
-
 
 if __name__ == "__main__":
 
@@ -55,4 +54,4 @@ if __name__ == "__main__":
 
     """
     print("Sample input:\n", sample_html)
-    print("Sample output:\n", html_clnr(sample_html, site='nunu'))
+    print("Sample output:\n", clean_food(sample_html, site='nunu'))
