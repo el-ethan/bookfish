@@ -40,7 +40,7 @@ def get_html(url, codec='gb18030'):
 
 def get_chapters(html):
     """Return list of chapter codes from html"""
-    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
+    re_find_chapters = re.compile('\d{6,}(?=.ht)')
     chapter_codes = re_find_chapters.findall(html)
     return chapter_codes
 
@@ -56,7 +56,7 @@ def get_novel_html(url, codec='gb18030'):
     html = urlopen(url).read().decode(codec)
 
     # Find chapter codes
-    re_find_chapters = re.compile('(?<=><a href=")\d+(?=\.)')
+    re_find_chapters = re.compile('\d{6,}(?=.ht)')
     chapter_codes = re_find_chapters.findall(html)
     # Find novel title
     re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
@@ -91,7 +91,7 @@ def bookfish(url, site='nunu', print_to_file=False):
 
 
 if __name__ == "__main__":
-    url = input("Enter a URL:").replace("index.html", "")
+    url = input("Enter a URL:")
     if not url:
         url = 'http://www.kanunu8.com/book3/7192/'
     print(bookfish(url))
