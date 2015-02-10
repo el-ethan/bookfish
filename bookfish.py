@@ -2,53 +2,52 @@
 import re
 from urllib.request import urlopen
 
-def bookfish(url, site='nunu', codec='gb18030', print_to_file=False):
+def bookfish(url, codec='gb18030', print_to_file=False):
     """Returns full text of novel
 
     If print_to_file is set to true, a text file
     with the contents of the novel will be created
     as 'title of novel.txt'
     """
+    sites = ['nunu', 'yanqing888', 'hexun']
+    for site_name in sites:
+        if site_name in url:
+            site = site_name
     # Get url tail
     # Get html
     html = urlopen(url).read().decode(codec)
-    # Get chapters
-    re_find_chapters = re.compile('\d{6,}(?=.ht)')
-    chapter_codes = re_find_chapters.findall(html)
     # Get title
     re_find_title = re.search('(?<=<title>).*(?=</title>)', html)
     title = re_find_title.group()
+    # Get chapters
+    if site == 'nunu':
+        re_find_tails = re.compile('(?<=<a href=")\d+.html?')
+    elif site == 'yanqing888':
+        re_find_tails = re.compile('(?<=<a href=")\d+.html')
+    elif site == 'hexun':
+        re_find_tails = re.compile('(?<=<a href="/)chapter[-\d\w]+.shtml')
+    url_tails = re_find_tails.findall(html)
     # Get html of novel
-    url_tails = {'nunu': '.html',
-                 'ifeng': '.htm'
-    }
     html_novel = ''
-    for code in chapter_codes:
-        url_base = re.sub('\.htm$|\.html$', '', url)
-        if site == 'ifeng':
-            url_base += '/'
-        new_url = url_base + code + url_tails[site]
+    for tail in url_tails:
+        url_base = re.sub('\.html?$|book-\d+.shtml', '', url)
+        new_url = url_base + tail
         html = urlopen(new_url).read().decode(codec)
         html_novel += '#'*20 + html
 
-    junk = re.compile('<a.*?</a>'         # Links and associated text
-                      '|<.*?>'            # HTML tags
-                      '|<!--.*-->'        # HTML comments
-                      '|&.*?;',           # Named character references
-                      flags=re.DOTALL)
+    text = re.sub('<a.*?</a>'
+                  '|<.*?>'
+                  # '|.*\}'
+                  # '|.*\{'
+                  '|<!--(.*\n)+?-->'
+                  '|&.*?;', '', html_novel)
     # Site specific junk to remove
-    site_junk = {
-            'nunu': ['--正文', '努努书坊 版权所有','|'],
-            'yq888': []
-    }
+    site_junk = ['--正文', '努努书坊 版权所有','|']
     # Extra newlines (2 or more consecutive)
     extra_lines = re.compile('\s{2,}')
-    text = re.sub(junk, '', html_novel)
-
     # Remove site specific junk from text
-    if site == 'nunu':
-        for junk in site_junk['nunu']:
-            text = text.replace(junk, '')
+    for junk in site_junk:
+        text = text.replace(junk, '')
     # Remove extra whitespace
     text = re.sub(extra_lines, '\n\n', text)
 
@@ -62,6 +61,6 @@ def bookfish(url, site='nunu', codec='gb18030', print_to_file=False):
 if __name__ == "__main__":
     url = input("Enter a URL:")
     if not url:
-        url = 'http://www.kanunu8.com/book3/7192/'
+        url = 'http://data.book.hexun.com/book-19250.shtml'
     print(bookfish(url))
 

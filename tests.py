@@ -8,7 +8,7 @@ class TestFish(unittest.TestCase):
 
     def test_made_novel(self):
         test_url = 'http://www.kanunu8.com/book3/7192/'
-        f = open('xiaoshuo.txt', 'r')
+        f = open('nunu_test.txt', 'r')
         text = f.read()
         f.close()
         self.assertEqual(bookfish.bookfish(test_url), text,
