@@ -2,6 +2,18 @@
 import re
 from urllib.request import urlopen
 
+class Bookfish():
+
+    def __init__(self, url):
+        self.url = url
+
+    def set_site(self, url):
+        sites = ['nunu', 'yanqing888', 'hexun', 'dddbbb']
+        for site_name in sites:
+            if site_name in url:
+                site = site_name
+
+
 def bookfish(url, codec='gb18030', print_to_file=False):
     """Returns full text of novel
 
@@ -65,8 +77,8 @@ def bookfish(url, codec='gb18030', print_to_file=False):
                  'hexun': ['if(w_frame.readyState)', 'else', '*/', '/*'
                  ],
                  'dddbbb': ['|', '>']
-
     }
+
 
     # Extra newlines (2 or more consecutive)
     extra_lines = re.compile('\s{2,}')
