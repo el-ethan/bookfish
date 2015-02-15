@@ -9,7 +9,7 @@ def bookfish(url, codec='gb18030', print_to_file=False):
     with the contents of the novel will be created
     as 'title of novel.txt'
     """
-    sites = ['nunu', 'yanqing888', 'hexun']
+    sites = ['nunu', 'yanqing888', 'hexun', 'dddbbb']
     for site_name in sites:
         if site_name in url:
             site = site_name
@@ -26,11 +26,17 @@ def bookfish(url, codec='gb18030', print_to_file=False):
         re_find_tails = re.compile('(?<=<a href=")\d+.html')
     elif site == 'hexun':
         re_find_tails = re.compile('(?<=<a href="/)chapter[-\d\w]+.shtml')
+    elif site == 'dddbbb':
+        re_find_tails = re.compile('(?<=<a href=")/\d+_\d+\.html')
+
     url_tails = re_find_tails.findall(html)
     # Get html of novel
     html_novel = ''
     for tail in url_tails:
-        url_base = re.sub('\.html?$|book-\d+.shtml', '', url)
+        url_base = re.sub('\.html?$'            # nunu, yanqing888
+                          '|book-\d+.shtml'     # hexun
+                          '|/html/.*opf.html',  # dddbbb
+                          '', url)
         new_url = url_base + tail
         html = urlopen(new_url).read().decode(codec)
         html_novel += '#'*20 + html
@@ -40,7 +46,7 @@ def bookfish(url, codec='gb18030', print_to_file=False):
                       '|<.*?>'
                       '|<!--(.*\n)+?-->'
                       '|&.*?;', '', html_novel)
-    elif site == 'hexun':
+    elif site == 'hexun' or site == 'dddbbb':
         text = re.sub('<a.*?</a>'
                       '|\n(.*</script>)'
                       '|<.*?\s?>'
@@ -57,7 +63,9 @@ def bookfish(url, codec='gb18030', print_to_file=False):
     site_junk = {'nunu': ['--正文', '努努书坊 版权所有','|'
                  ],
                  'hexun': ['if(w_frame.readyState)', 'else', '*/', '/*'
-                 ]
+                 ],
+                 'dddbbb': ['|', '>']
+
     }
 
     # Extra newlines (2 or more consecutive)
