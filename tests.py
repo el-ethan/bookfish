@@ -1,7 +1,10 @@
 """Various tests of bookfish."""
+
+from urllib.request import urlopen
 import unittest
 import bookfish
-from urllib.request import urlopen
+import mjbk
+
 
 
 class TestFish(unittest.TestCase):
@@ -13,6 +16,15 @@ class TestFish(unittest.TestCase):
         f.close()
         self.assertEqual(bookfish.bookfish(test_url), text,
                          "Output does not match test novel")
+
+class TestDecoderRing(unittest.TestCase):
+
+    def test_bake_to_moji(self):
+        """Verify that mojibake is correctly converted to characters"""
+        mjbk = '¸æËßÎÒ'
+        mj = '告诉我'
+        moji = mjbk.decoder_ring(mjbk)
+        self.assertIn(mj, moji)
 
 if __name__ == "__main__":
     unittest.main()
