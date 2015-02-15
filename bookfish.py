@@ -35,18 +35,35 @@ def bookfish(url, codec='gb18030', print_to_file=False):
         html = urlopen(new_url).read().decode(codec)
         html_novel += '#'*20 + html
 
-    text = re.sub('<a.*?</a>'
-                  '|<.*?>'
-                  # '|.*\}'
-                  # '|.*\{'
-                  '|<!--(.*\n)+?-->'
-                  '|&.*?;', '', html_novel)
+    if site == 'nunu':
+        text = re.sub('<a.*?</a>'
+                      '|<.*?>'
+                      '|<!--(.*\n)+?-->'
+                      '|&.*?;', '', html_novel)
+    elif site == 'hexun':
+        text = re.sub('<a.*?</a>'
+                      '|\n(.*</script>)'
+                      '|<.*?\s?>'
+                      '|.*\}'
+                      '|.*\{'
+                      '|.*;'
+                      '|<!--(.*\n)+?-->'
+                      '|&.*?;'
+                      '|src=.*'
+                      '|<iframe.*'
+                      '|//.*'
+                      '|..onclick=.*', '', html_novel)
     # Site specific junk to remove
-    site_junk = ['--正文', '努努书坊 版权所有','|']
+    site_junk = {'nunu': ['--正文', '努努书坊 版权所有','|'
+                 ],
+                 'hexun': ['if(w_frame.readyState)', 'else', '*/', '/*'
+                 ]
+    }
+
     # Extra newlines (2 or more consecutive)
     extra_lines = re.compile('\s{2,}')
     # Remove site specific junk from text
-    for junk in site_junk:
+    for junk in site_junk[site]:
         text = text.replace(junk, '')
     # Remove extra whitespace
     text = re.sub(extra_lines, '\n\n', text)
