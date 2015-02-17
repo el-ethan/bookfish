@@ -11,8 +11,7 @@ zw_codecs = ['gb18030', 'gb2312', 'gbk', 'big5']
 
 def decoder_ring(mojibake,
                  encoders=codecs,
-                 decoders=zw_codecs,
-                 output_type='lst'):
+                 decoders=codecs):
 
     moji = {}
     moji_list = []
@@ -30,27 +29,24 @@ def decoder_ring(mojibake,
                     moji[(encoder, decoder)] = d_moji
                     moji_list.append(d_moji)
 
-    if output_type == 'dct':
-        return moji
-    elif output_type == 'lst':
-        return moji_list
-
-if __name__ == '__main__':
-
-    bakemono = ['ꦻ', 'cF', 'ꮪ', '', 'ꫤ', 'ꪪ', 'ⵄ', '㎸']
-
-    with open('mojibake.txt', 'r') as f:
-        mjbk = f.read()
-
-    moji = decoder_ring(mjbk, decoders=codecs, output_type='dct')
+    results = {}
     with open('most_common.txt', 'r') as f:
         most_common = f.read()
     for k, v in moji.items():
-        # print(k, '\n', set(v), '\n\n\n')
         overlap = set(most_common) & set(v)
         if len(overlap) >= len(set(v)) * .5:
-            print(k, v)
-            print(len(moji))
-            print(len(most_common))
+            results[k] = v
 
+    preview = ''
+    for codecs, result in results.items():
+        # print(codecs)
+        preview += result[:100] + '...End Preview...'
+
+    return preview
+
+if __name__ == '__main__':
+
+    with open('mojibake.txt', 'r') as f:
+        mojibake = f.read()
+    print(decoder_ring(mojibake))
 
