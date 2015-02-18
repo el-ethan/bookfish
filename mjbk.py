@@ -11,10 +11,11 @@ zw_codecs = ['gb18030', 'gb2312', 'gbk', 'big5']
 
 def decoder_ring(mojibake,
                  encoders=codecs,
-                 decoders=codecs):
-
+                 decoders=codecs,
+                 show_preview=False):
+    with open('most_common.txt', 'r') as f:
+        most_common = f.read()
     moji = {}
-    moji_list = []
     for encoder in encoders:
         try:
             mj = bytes(mojibake, encoding=encoder)
@@ -22,27 +23,15 @@ def decoder_ring(mojibake,
             continue
         for decoder in decoders:
             try:
-                d_moji = mj.decode(decoder)
+                decoded_moji = mj.decode(decoder)
             except UnicodeDecodeError:
                 continue
-            if (d_moji not in moji.values()):
-                    moji[(encoder, decoder)] = d_moji
-                    moji_list.append(d_moji)
 
-    results = {}
-    with open('most_common.txt', 'r') as f:
-        most_common = f.read()
-    for k, v in moji.items():
-        overlap = set(most_common) & set(v)
-        if len(overlap) >= len(set(v)) * .5:
-            results[k] = v
+            overlap = set(most_common) & set(decoded_moji)
+            if len(overlap) >= len(set(decoded_moji)) * .5:
+                moji[(encoder, decoder)] = decoded_moji
+                return moji
 
-    preview = ''
-    for codecs, result in results.items():
-        # print(codecs)
-        preview += result[:100] + '...End Preview...'
-
-    return preview
 
 if __name__ == '__main__':
 
