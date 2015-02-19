@@ -4,18 +4,38 @@ from urllib.request import urlopen
 
 class Bookfish():
 
-    fish = '¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>'
-    fish2 = u"\U0001F41F Thanks for using Bookfish!"
-    fish3 = u"\U0001F41F" * 20
-    fish4 = "\U0001F41F" * 20
-    site_names = ['nunu', 'yanqing888', 'hexun', 'dddbbb']
+    sites = {'nunu':
+                   {'junk': '<a.*?</a>'
+                            '|<.*?>'
+                            '|<!--(.*\n)+?-->'
+                            '|&.*?;',
+                    'tails': '(?<=<a href=")\d+.html?'},
+            'hexun':{'junk': '<a.*?</a>'
+                             '|\n(.*</script>)'
+                             '|<.*?\s?>'
+                             '|.*\}'
+                             '|.*\{'
+                             '|.*;'
+                             '|<!--(.*\n)+?-->'
+                             '|&.*?;'
+                             '|src=.*'
+                             '|<iframe.*'
+                             '|//.*'
+                             '|..onclick=.*',
+                    'tails': '(?<=<a href="/)chapter[-\d\w]+.shtml'},
+            'yanqing888':{'junk': '',
+                    'tails': '(?<=<a href=")\d+.html'},
+            'dddbbb':{'junk': '',
+                      'tails': '(?<=<a href=")/\d+_\d+\.html'},
+    }
     codec = 'gb18030'
+    fish = '¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>'
 
     def __init__(self, url):
 
         self.url = url
         self.site_name = ''
-        for sn in self.site_names:
+        for sn in self.sites.keys():
             if sn in self.url:
                 self.site_name = sn
         self.html = self.get_html()
@@ -34,15 +54,16 @@ class Bookfish():
 
     def get_html_book(self):
         # Get chapters
-        if self.site_name == 'nunu':
-            re_find_tails = re.compile('(?<=<a href=")\d+.html?')
-        elif self.site_name == 'yanqing888':
-            re_find_tails = re.compile('(?<=<a href=")\d+.html')
-        elif self.site_name == 'hexun':
-            re_find_tails = re.compile('(?<=<a href="/)chapter[-\d\w]+.shtml')
-        elif self.site_name == 'dddbbb':
-            re_find_tails = re.compile('(?<=<a href=")/\d+_\d+\.html')
+        # if self.site_name == 'nunu':
+        #     re_find_tails = re.compile('(?<=<a href=")\d+.html?')
+        # elif self.site_name == 'yanqing888':
+        #     re_find_tails = re.compile('(?<=<a href=")\d+.html')
+        # elif self.site_name == 'hexun':
+        #     re_find_tails = re.compile('(?<=<a href="/)chapter[-\d\w]+.shtml')
+        # elif self.site_name == 'dddbbb':
+        #     re_find_tails = re.compile('(?<=<a href=")/\d+_\d+\.html')
 
+        re_find_tails = re.compile(self.sites[self.site_name]['tails'])
         url_tails = re_find_tails.findall(self.html)
         # Get html of novel
         html_book = ''
@@ -57,26 +78,9 @@ class Bookfish():
         return html_book
 
     def get_book(self):
-        if self.site_name == 'nunu':
-            text = re.sub('<a.*?</a>'
-                          '|<.*?>'
-                          '|<!--(.*\n)+?-->'
-                          '|&.*?;', '', self.html_book)
-        elif self.site_name == 'hexun' or self.site_name == 'dddbbb':
-            text = re.sub('<a.*?</a>'
-                          '|\n(.*</script>)'
-                          '|<.*?\s?>'
-                          '|.*\}'
-                          '|.*\{'
-                          '|.*;'
-                          '|<!--(.*\n)+?-->'
-                          '|&.*?;'
-                          '|src=.*'
-                          '|<iframe.*'
-                          '|//.*'
-                          '|..onclick=.*', '', self.html_book)
+        text = re.sub(self.sites[self.site_name]['junk'], '', self.html_book)
         # self.site_name specific junk to remove
-        site_junk = {'nunu': ['--正文', '努努书坊 版权所有','|'
+        leftover_junk = {'nunu': ['--正文', '努努书坊 版权所有','|'
                      ],
                      'hexun': ['if(w_frame.readyState)', 'else', '*/', '/*'
                      ],
@@ -85,18 +89,18 @@ class Bookfish():
         # Extra newlines (2 or more consecutive)
         extra_lines = re.compile('\s{2,}')
         # Remove self.site_name specific junk from text
-        for junk in site_junk[self.site_name]:
-            text = text.replace(junk, '')
+        for j in leftover_junk[self.site_name]:
+            text = text.replace(j, '')
         # Remove extra whitespace
         text = re.sub(extra_lines, '\n\n', text)
-        text += '\n' + u'\U0001F41F'*20
+        # text += '\n' + u'\U0001F41F'*20
         return text
 
     def make_file(self):
         with open("%s.txt" % self.title, 'ab') as f:
             f.write(self.book.encode('utf-8'))
 
-    def fishy(self):
+    def get_fish(self):
         return self.fish
 
 # if __name__ == "__main__":
