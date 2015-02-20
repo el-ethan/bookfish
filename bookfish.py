@@ -1,14 +1,20 @@
+# _*_ coding: utf-8 _*_
 # TODO: Write docstrings
 import re
-from urllib.request import urlopen
+
+try:
+    import urllib2  # For compatibility with Python 2.X
+    from urllib.request import urlopen
+except ImportError:
+    pass
+
 
 class Bookfish():
 
-    sites = {'nunu':
-                   {'junk': '<a.*?</a>'
-                            '|<.*?>'
-                            '|<!--(.*\n)+?-->'
-                            '|&.*?;',
+    sites = {'nunu':{'junk': '<a.*?</a>'
+                             '|<.*?>'
+                             '|<!--(.*\n)+?-->'
+                             '|&.*?;',
                     'tails': '(?<=<a href=")\d+.html?'},
             'hexun':{'junk': '<a.*?</a>'
                              '|\n(.*</script>)'
@@ -29,6 +35,7 @@ class Bookfish():
                       'tails': '(?<=<a href=")/\d+_\d+\.html'},
     }
     codec = 'gb18030'
+    codecs = ['gb18030', 'gb2312', 'gbk', 'big5']
     fish = '¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>'
 
     def __init__(self, url):
@@ -38,13 +45,23 @@ class Bookfish():
         for sn in self.sites.keys():
             if sn in self.url:
                 self.site_name = sn
-        self.html = self.get_html()
+        self.html = self.get_html(self.url)
         self.title = self.get_title()
         self.html_book = self.get_html_book()
         self.book = self.get_book()
 
-    def get_html(self):
-        html = urlopen(self.url).read().decode(self.codec)
+    def codec_generator(self):
+        for codec in self.codecs:
+            yield codec
+
+    def get_html(self, url):
+        codec = self.codec_generator()
+        while True:
+            try:
+                html = urlopen(url).read().decode(next(codec))
+                break
+            except UnicodeDecodeError:
+                continue
         return html
 
     def get_title(self):
@@ -53,16 +70,6 @@ class Bookfish():
         return title
 
     def get_html_book(self):
-        # Get chapters
-        # if self.site_name == 'nunu':
-        #     re_find_tails = re.compile('(?<=<a href=")\d+.html?')
-        # elif self.site_name == 'yanqing888':
-        #     re_find_tails = re.compile('(?<=<a href=")\d+.html')
-        # elif self.site_name == 'hexun':
-        #     re_find_tails = re.compile('(?<=<a href="/)chapter[-\d\w]+.shtml')
-        # elif self.site_name == 'dddbbb':
-        #     re_find_tails = re.compile('(?<=<a href=")/\d+_\d+\.html')
-
         re_find_tails = re.compile(self.sites[self.site_name]['tails'])
         url_tails = re_find_tails.findall(self.html)
         # Get html of novel
@@ -73,7 +80,7 @@ class Bookfish():
                               '|/html/.*opf.html',  # dddbbb
                               '', self.url)
             new_url = url_base + tail
-            html = urlopen(new_url).read().decode(self.codec)
+            html = self.get_html(new_url)
             html_book += '#'*20 + html
         return html_book
 
@@ -102,6 +109,20 @@ class Bookfish():
 
     def get_fish(self):
         return self.fish
+
+
+class TwoFish(Bookfish):
+    fish = '><(((º>TwoFish<º)))><'
+
+    def get_html(self, url):
+        codec = self.codec_generator()
+        while True:
+            try:
+                html = urllib2.urlopen(url).read().decode(next(codec))
+                break
+            except UnicodeDecodeError:
+                continue
+        return html
 
 # if __name__ == "__main__":
 #     url = input("Enter a URL:")
