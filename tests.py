@@ -1,6 +1,5 @@
 """Various tests of bookfish."""
 
-from urllib.request import urlopen
 import unittest
 import bookfish
 import mjbk

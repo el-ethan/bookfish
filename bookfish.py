@@ -1,12 +1,10 @@
 # _*_ coding: utf-8 _*_
 # TODO: Write docstrings
 import re
-
 try:
-    import urllib2  # For compatibility with Python 2.X
     from urllib.request import urlopen
 except ImportError:
-    pass
+    import urllib2  # For compatibility with Python 2.X
 
 
 class Bookfish():
