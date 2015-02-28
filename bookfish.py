@@ -1,5 +1,34 @@
 # _*_ coding: utf-8 _*_
-# TODO: Write docstrings
+"""
+><(((º>Bookfish
+Bookfish is a tool for extracting Chinese novels from html.
+
+This is useful if you don't want to read in the distracting
+browser environment littered with pop-ups.
+
+This module contains the class Bookfish(), which takes a URL
+of a novel index/table of contents page as its only argument.
+it will subsequently get the html from all the chapters of the
+novel, remove html tags and some other extraneous text, and
+return a more readable version of the novel. Options are available
+to save the text to a file.
+
+Currently, Bookfish is customized to work with novels hosted on
+particular sites.
+
+Supported sites:
+* kanunu8.com
+* yanqing888.com
+* hexun.com
+* dddbbb.net
+
+><(((º>TwoFish<º)))><
+The module also includes TwoFish, a subclass of Bookfish, which will
+function with Python 2.7. All methods are inherited from Bookfish,
+except the get_html method which is overridden by TwoFish and uses
+urllib2.urlopen() to retrieve html instead of urllib.request.urlopen()
+"""
+
 import re
 try:
     from urllib.request import urlopen
@@ -32,9 +61,8 @@ class Bookfish():
             'dddbbb':{'junk': '',
                       'tails': '(?<=<a href=")/\d+_\d+\.html'},
     }
-    codec = 'gb18030'
+
     codecs = ['gb18030', 'gb2312', 'gbk', 'big5']
-    fish = '¸.·´¯`·.´¯`·.¸¸.·´¯`·.¸><(((º>'
 
     def __init__(self, url):
 
@@ -104,9 +132,6 @@ class Bookfish():
     def make_file(self):
         with open("%s.txt" % self.title, 'ab') as f:
             f.write(self.book.encode('utf-8'))
-
-    def get_fish(self):
-        return self.fish
 
 
 class TwoFish(Bookfish):
