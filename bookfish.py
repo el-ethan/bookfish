@@ -1,6 +1,6 @@
 # _*_ coding: utf-8 _*_
 """
-><(((º>Bookfish
+#Bookfish
 Bookfish is a tool for extracting Chinese novels from html.
 
 This is useful if you don't want to read in the distracting
@@ -10,7 +10,7 @@ This module contains the class Bookfish(), which takes a URL
 of a novel index/table of contents page as its only argument.
 it will subsequently get the html from all the chapters of the
 novel, remove html tags and some other extraneous text, and
-return a more readable version of the novel. Options are available
+return a more readable version of the novel. Methods are available
 to save the text to a file.
 
 Currently, Bookfish is customized to work with novels hosted on
@@ -22,11 +22,11 @@ Supported sites:
 * hexun.com
 * dddbbb.net
 
-><(((º>TwoFish<º)))><
-The module also includes TwoFish, a subclass of Bookfish, which will
-function with Python 2.7. All methods are inherited from Bookfish,
-except the get_html method which is overridden by TwoFish and uses
-urllib2.urlopen() to retrieve html instead of urllib.request.urlopen()
+#TwoFish
+TwoFish is a subclass of Bookfish that functions with Python 2.7.
+All methods are inherited from Bookfish, except the get_html method
+which is overridden by TwoFish and uses urllib2.urlopen() to retrieve
+html instead of urllib.request.urlopen()
 """
 
 import re
@@ -53,6 +53,28 @@ class Bookfish():
     a txt file in the cwd. The name of the file will be the same as the
     object's title attribute.
     """
+
+    nunu_re = re.compile("""
+                        <a.*?</a>
+                        |<.*?>
+                        |<!--(.*\n)+?-->
+                        |&.*?;
+                         """, re.VERBOSE)
+    hexun_re = re.compile("""
+                        <a.*?</a>
+                        |\n(.*</script>)
+                        |<.*?\s?>
+                        |.*\}
+                        |.*\{
+                        |.*;
+                        |<!--(.*\n)+?-->
+                        |&.*?;
+                        |src=.*
+                        |<iframe.*
+                        |//.*
+                        |..onclick=.*
+                          """)
+
     sites = {'nunu':{'junk': '<a.*?</a>'
                              '|<.*?>'
                              '|<!--(.*\n)+?-->'
