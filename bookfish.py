@@ -9,7 +9,7 @@ class Bookfish(object):
 
     def __init__(self, url):
         self.url = url
-        self.html1 = self.get_html(self.url)
+        self.html = self.get_html(self.url)
         self.chapters = self.find_chapter_urls()
         self.title = self.get_title_author()[0]
         self.author = self.get_title_author()[1]
@@ -24,15 +24,15 @@ class Bookfish(object):
     def find_chapter_urls(self):
         """Take url and return chapters"""
         regex = re.compile(r'(?<=href=")\d+\.html')
-        m = re.findall(regex, self.html1)
+        m = re.findall(regex, self.html)
         chapter_urls = []
         for chapter in m:
-            chapter_urls.append(self.url + chapter)
+            chapter_urls.append(self.url.replace('index.html','') + chapter)
         return chapter_urls
 
     def get_title_author(self):
         regex = re.compile(r'(?<=<title>)(.*?)\s-\s(.*?)(?=\s-.*</title>)')
-        m = regex.search(self.html1)
+        m = regex.search(self.html)
         return m.groups()
 
     def get_book(self):

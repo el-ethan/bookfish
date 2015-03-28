@@ -14,7 +14,7 @@ fish = Bookfish(test_url)
 
 class TestFish(unittest.TestCase):
 
-    def test_right_number_of_chapters(self):
+    def test_right_number_of_chapter_urls(self):
         """Verify that the right amount of chapters are found"""
         chapters = fish.find_chapter_urls()
         self.assertEqual(len(chapters), 6)
@@ -43,7 +43,7 @@ class TestFish(unittest.TestCase):
         """Verify no html entities in final text"""
         self.assertNotRegex(fish.book, r'&.*?;')
 
-    def test_right_number_chapters_processed(self):
+    def test_right_number_chapters_in_book(self):
         """Verify the right number of chapters processed"""
         fish_char = u'\U0001F41F'
         chapter_count = fish.book.count(fish_char)
