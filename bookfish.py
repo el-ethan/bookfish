@@ -37,18 +37,34 @@ class Bookfish(object):
 
     def get_book(self):
         html = ''
+        # Unicode fish character used as chapter separator
+        fish_char = u'\U0001F41F'
         for chapter in self.chapters:
-            html += self.get_html(chapter)
+            html += (fish_char) + self.get_html(chapter)
 
-        regex1 = re.compile(r'<.*?>')
-        book = re.sub(regex1, '', html)
+        regex = re.compile(r"""
+                           <a.*?</a>        # Links
+                           |<.*?>           # HTML tags
+                           |-?&.*?;         # HTML entities
+                           |\|              # Pipes
+                           |\s{3,}          # Empty space
+                           |<!--.*?-->      # HTML comments
+                           """, re.VERBOSE | re.DOTALL)
+        regex_site_specific = re.compile(r"""
+                                        正文\s
+                                        |业务QQ:\s\d+
+                                        |\s小说在线阅读\s
+                                        |努努书坊\s版权所有
+                                         """, re.VERBOSE)
+
+        book = re.sub(regex, '', html)
+        book = re.sub(regex_site_specific, '', book)
+
         return book
 
-
-
-
-
 if __name__ == '__main__':
-    url = 'http://www.kanunu8.com/book3/7192/'
+    url = input("Enter a URL or press return: ")
+    if not url:
+        url = 'http://www.kanunu8.com/book3/7192/'
     fish = Bookfish(url)
-    print(fish.chapters)
+    print(fish.book)

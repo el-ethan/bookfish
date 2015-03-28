@@ -41,7 +41,13 @@ class TestFish(unittest.TestCase):
 
     def test_no_html_entities(self):
         """Verify no html entities in final text"""
-        pass
+        self.assertNotRegex(fish.book, r'&.*?;')
+
+    def test_right_number_chapters_processed(self):
+        """Verify the right number of chapters processed"""
+        fish_char = u'\U0001F41F'
+        chapter_count = fish.book.count(fish_char)
+        self.assertEqual(chapter_count, 6)
 
 if __name__ == "__main__":
     unittest.main()
