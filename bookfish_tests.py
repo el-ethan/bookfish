@@ -9,7 +9,7 @@ from bookfish import Bookfish
 # Link to index page of 古典爱情 by 余华
 test_url = 'http://www.kanunu8.com/book3/7192/'
 
-test_urls = [test_url,
+nunu_urls = [test_url,
              'http://www.kanunu8.com/book/4397/index.html',
              'http://www.kanunu8.com/book3/7385/',
              'http://www.kanunu8.com/book3/8243/',
@@ -64,7 +64,7 @@ class TestGeneral(unittest.TestCase):
 
     def test_bulk_urls(self):
         """Verify multiple urls pass general tests of length and content"""
-        for url in test_urls:
+        for url in nunu_urls:
             fish = Bookfish(url)
             chapter_urls = fish.find_chapter_urls()
             fish_char = u'\U0001F41F'
