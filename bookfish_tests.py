@@ -44,10 +44,14 @@ class TestFish(unittest.TestCase):
         self.assertNotRegex(fish.book, r'&.*?;')
 
     def test_right_number_chapters_in_book(self):
-        """Verify the right number of chapters processed"""
+        """Verify that the right number of chapters is processed"""
         fish_char = u'\U0001F41F'
         chapter_count = fish.book.count(fish_char)
         self.assertEqual(chapter_count, 6)
+
+    def test_char_count(self):
+        """Verify that text has the expected amount of characters"""
+        self.assertEqual(fish.charcount, 23364)
 
 if __name__ == "__main__":
     unittest.main()

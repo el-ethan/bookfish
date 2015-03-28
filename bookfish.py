@@ -14,6 +14,7 @@ class Bookfish(object):
         self.title = self.get_title_author()[0]
         self.author = self.get_title_author()[1]
         self.book = self.get_book()
+        self.charcount = len(self.book.strip())
 
     def get_html(self, url):
         f = urllib.request.urlopen(url)
