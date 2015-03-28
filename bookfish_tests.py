@@ -9,6 +9,13 @@ from bookfish import Bookfish
 # Link to index page of 古典爱情 by 余华
 test_url = 'http://www.kanunu8.com/book3/7192/'
 
+test_urls = [test_url,
+             'http://www.kanunu8.com/book/4397/index.html',
+             'http://www.kanunu8.com/book3/7385/',
+             'http://www.kanunu8.com/book3/8243/',
+]
+
+
 # Bookfish object to be tested
 fish = Bookfish(test_url)
 
@@ -21,9 +28,9 @@ class TestFish(unittest.TestCase):
 
     def test_right_form_of_chapter_urls(self):
         """Verify that chapter urls are of the right form"""
-        chapters = fish.chapters
-        for chapter_url in chapters:
-            self.assertRegex(chapter_url, r'http://www\.kanunu8\.com.*\.html')
+        chapter_urls = fish.chapters
+        for url in chapter_urls:
+            self.assertRegex(url, r'http://www\.kanunu8\.com.*\.html')
 
     def test_title(self):
         expected_title = '古典爱情'
@@ -52,6 +59,25 @@ class TestFish(unittest.TestCase):
     def test_char_count(self):
         """Verify that text has the expected amount of characters"""
         self.assertEqual(fish.charcount, 23364)
+
+class TestGeneral(unittest.TestCase):
+
+    def test_bulk_urls(self):
+        """Verify multiple urls pass general tests of length and content"""
+        for url in test_urls:
+            fish = Bookfish(url)
+            chapter_urls = fish.find_chapter_urls()
+            fish_char = u'\U0001F41F'
+            chapter_count = fish.book.count(fish_char)
+            self.assertGreater(chapter_count, 1)
+            self.assertGreater(len(chapter_urls), 1)
+            self.assertGreater(fish.charcount, 100)
+            self.assertNotRegex(fish.book, r'&.*?;')
+            self.assertNotRegex(fish.book, r'<.*?>')
+            self.assertIsNotNone(fish.author)
+            self.assertIsNotNone(fish.title)
+
+
 
 if __name__ == "__main__":
     unittest.main()
