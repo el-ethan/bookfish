@@ -35,16 +35,13 @@ class TestFish(unittest.TestCase):
         author = fish.author
         self.assertEqual(author, expected_author)
 
-    def test_book_length(self):
+    def test_no_html_tags(self):
+        """Verify that normal html tags have been removed from text"""
+        self.assertNotRegex(fish.book, r'<.*?>')
+
+    def test_no_html_entities(self):
+        """Verify no html entities in final text"""
         pass
-
-
-
-
-    # def test_no_tags(self):
-    #     """Verify that all HTML tags have been removed from text"""
-    #     raise AssertionError("Tests not yet written")
-
 
 if __name__ == "__main__":
     unittest.main()
