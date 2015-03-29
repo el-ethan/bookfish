@@ -2,6 +2,7 @@
 """Various tests of bookfish module"""
 
 import unittest
+import os
 from bookfish import Bookfish
 
 
@@ -33,11 +34,13 @@ class TestFish(unittest.TestCase):
             self.assertRegex(url, r'http://www\.kanunu8\.com.*\.html')
 
     def test_title(self):
+        "Verify title is as expected"
         expected_title = '古典爱情'
         title = fish.title
         self.assertEqual(title, expected_title)
 
     def test_author(self):
+        """Verify author is as expected"""
         expected_author = '余华'
         author = fish.author
         self.assertEqual(author, expected_author)
@@ -60,6 +63,12 @@ class TestFish(unittest.TestCase):
         """Verify that text has the expected amount of characters"""
         self.assertEqual(fish.charcount, 23364)
 
+    def test_file_saved(self):
+        fish = Bookfish(test_url, print_to_file=True)
+        saved_file = '{0}_{1}.txt'.format(fish.title, fish.author)
+        self.assertTrue(os.path.exists(saved_file))
+        os.remove(saved_file)
+
 class TestGeneral(unittest.TestCase):
 
     def test_bulk_urls(self):
@@ -76,8 +85,6 @@ class TestGeneral(unittest.TestCase):
             self.assertNotRegex(fish.book, r'<.*?>')
             self.assertIsNotNone(fish.author)
             self.assertIsNotNone(fish.title)
-
-
 
 if __name__ == "__main__":
     unittest.main()

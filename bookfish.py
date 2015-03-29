@@ -7,7 +7,7 @@ import urllib.request
 
 class Bookfish(object):
 
-    def __init__(self, url):
+    def __init__(self, url, print_to_file=False):
         self.url = url
         self.html = self.get_html(self.url)
         self.chapters = self.find_chapter_urls()
@@ -15,6 +15,11 @@ class Bookfish(object):
         self.author = self.get_title_author()[1]
         self.book = self.get_book()
         self.charcount = len(self.book.strip())
+
+        if print_to_file:
+            filename = '{0}_{1}.txt'.format(self.title, self.author)
+            with open(filename, 'w') as f:
+                f.write(self.book)
 
     def get_html(self, url):
         f = urllib.request.urlopen(url)
