@@ -33,7 +33,7 @@ class Bookfish(object):
         m = re.findall(regex, self.html)
         chapter_urls = []
         for chapter in m:
-            chapter_urls.append(self.url.replace('index.html','') + chapter)
+            chapter_urls.append(self.url.rstrip('index.html') + chapter)
         return chapter_urls
 
     def get_title_author(self):
