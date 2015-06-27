@@ -55,9 +55,9 @@ class Bookfish(object):
         """Return text of novel"""
         html = ''
         # Unicode fish character used as chapter separator
-        ascii_fish ="><(((('>"
+        chap_sep = '*' * 80
         for chapter in self.chapters:
-            html += (ascii_fish) + self.get_html(chapter)
+            html += (chap_sep) + self.get_html(chapter)
 
         regex = re.compile(r"""
                            <a.*?</a>        # Links
