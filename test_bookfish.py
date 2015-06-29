@@ -15,8 +15,6 @@ nunu_urls = [test_url,
              'http://www.kanunu8.com/book3/7385/',
              'http://www.kanunu8.com/book3/8243/',
 ]
-
-
 # Bookfish object to be tested
 fish = Bookfish(test_url)
 

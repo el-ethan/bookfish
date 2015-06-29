@@ -5,8 +5,9 @@ Bookfish crawls through Chinese novel websites and gives you the novels in plain
 text.
 """
 import re
+from timeit import timeit
 import urllib.request
-
+import cProfile as profile
 
 class Bookfish(object):
     """Bookfish objects are passed a url of an index page for a Chinese novel
@@ -38,11 +39,9 @@ class Bookfish(object):
 
     def find_chapter_urls(self):
         """Take url and return chapters"""
-        regex = re.compile(r'(?<=href=")\d+\.html')
-        m = re.findall(regex, self.html)
-        chapter_urls = []
-        for chapter in m:
-            chapter_urls.append(self.url.rstrip('index.html') + chapter)
+        m = re.findall(r'(?<=href=")\d+\.html', self.html)
+        url_base = self.url.rstrip('index.html')
+        chapter_urls = [url_base + chapter for chapter in m]
         return chapter_urls
 
     def get_title_author(self):
@@ -67,6 +66,7 @@ class Bookfish(object):
                            |\s{3,}          # Empty space
                            |<!--.*?-->      # HTML comments
                            """, re.VERBOSE | re.DOTALL)
+
         regex_site_specific = re.compile(r"""
                                         正文\s
                                         |业务QQ:\s\d+
@@ -78,6 +78,13 @@ class Bookfish(object):
         book = re.sub(regex_site_specific, '', book)
 
         return book
+ 
+# test_url = 'http://www.kanunu8.com/book3/7192/'
+# print("Please wait...")
+# print(timeit('Bookfish(test_url)', 
+#              'from __main__ import Bookfish, test_url', number=10))
+
+# profile.run('Bookfish(test_url)')
 
 if __name__ == '__main__':
     test_url = input("Enter a URL or press return: ")
@@ -85,3 +92,4 @@ if __name__ == '__main__':
         test_url = 'http://www.kanunu8.com/book3/7192/'
     fish = Bookfish(test_url)
     print(fish.book)
+    
