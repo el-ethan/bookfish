@@ -41,7 +41,7 @@ class Bookfish(object):
         """Take url and return chapters"""
         m = re.findall(r'(?<=href=")\d+\.html', self.html)
         url_base = self.url.rstrip('index.html')
-        chapter_urls = [url_base + chapter for chapter in m]
+        chapter_urls = (url_base + chapter for chapter in m)
         return chapter_urls
 
     def get_title_author(self):
@@ -79,17 +79,21 @@ class Bookfish(object):
 
         return book
  
-# test_url = 'http://www.kanunu8.com/book3/7192/'
-# print("Please wait...")
-# print(timeit('Bookfish(test_url)', 
-#              'from __main__ import Bookfish, test_url', number=10))
+
+if __name__ == '__main__':
+
+    test_url = 'http://www.kanunu8.com/book3/7192/'
+    print("Please wait...")
+    print(timeit('Bookfish(test_url)', 
+                 'from __main__ import Bookfish, test_url', number=10))
 
 # profile.run('Bookfish(test_url)')
 
-if __name__ == '__main__':
-    test_url = input("Enter a URL or press return: ")
-    if not test_url:
-        test_url = 'http://www.kanunu8.com/book3/7192/'
-    fish = Bookfish(test_url)
-    print(fish.book)
+
+
+    # test_url = input("Enter a URL or press return: ")
+    # if not test_url:
+    #     test_url = 'http://www.kanunu8.com/book3/7192/'
+    # fish = Bookfish(test_url)
+    # print(fish.book)
     
