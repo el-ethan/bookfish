@@ -82,18 +82,16 @@ class Bookfish(object):
 
 if __name__ == '__main__':
 
-    test_url = 'http://www.kanunu8.com/book3/7192/'
-    print("Please wait...")
-    print(timeit('Bookfish(test_url)', 
-                 'from __main__ import Bookfish, test_url', number=10))
+    # test_url = 'http://www.kanunu8.com/book3/7192/'
+    # print("Please wait...")
+    # print(timeit('Bookfish(test_url)', 
+    #              'from __main__ import Bookfish, test_url', number=10))
 
-# profile.run('Bookfish(test_url)')
+    # profile.run('Bookfish(test_url)')
 
-
-
-    # test_url = input("Enter a URL or press return: ")
-    # if not test_url:
-    #     test_url = 'http://www.kanunu8.com/book3/7192/'
-    # fish = Bookfish(test_url)
-    # print(fish.book)
+    test_url = input("Enter a URL or press return: ")
+    if not test_url:
+        test_url = 'http://www.kanunu8.com/book3/7192/'
+    fish = Bookfish(test_url)
+    print(fish.book)
     
