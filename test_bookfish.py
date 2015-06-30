@@ -23,7 +23,7 @@ class TestFish(unittest.TestCase):
     def test_right_number_of_chapter_urls(self):
         """Verify that the right amount of chapters are found"""
         chapters = fish.find_chapter_urls()
-        self.assertEqual(len(chapters), 6)
+        self.assertEqual(len(list(chapters)), 6)
 
     def test_right_form_of_chapter_urls(self):
         """Verify that chapter urls are of the right form"""
@@ -77,7 +77,7 @@ class TestGeneral(unittest.TestCase):
             chap_sep = '*' * 80
             chapter_count = fish.book.count(chap_sep)
             self.assertGreater(chapter_count, 1)
-            self.assertGreater(len(chapter_urls), 1)
+            self.assertGreater(len(list(chapter_urls)), 1)
             self.assertGreater(fish.charcount, 100)
             self.assertNotRegex(fish.book, r'&.*?;')
             self.assertNotRegex(fish.book, r'<.*?>')
