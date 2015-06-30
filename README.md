@@ -6,7 +6,7 @@ To get the plain text of a novel, simply pass the url of a novel's index page to
 
 ```python            
 >>> from bookfish import Bookfish
->>> fish = Bookfish('http://www.kanunu8.com/book3/7198/159302.html')
+>>> fish = Bookfish('http://www.kanunu8.com/book3/7193/')
 ```
 
 Now you have your Bookfish instance `fish`, which you can do what you want with.
